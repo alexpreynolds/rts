@@ -40,9 +40,9 @@ rts::RTS::sample_metadata_bitset(void)
 				if (
 					bit &&
 					(
-						((this->square_matrix_type() == RTS::UpperTriangular) && (synthetic_col > synthetic_row)) 
+						((this->square_matrix_type() == RTS::LowerTriangular) && (synthetic_col > synthetic_row)) 
 						||	
-						((this->square_matrix_type() == RTS::LowerTriangular) && (synthetic_col < synthetic_row))
+						((this->square_matrix_type() == RTS::UpperTriangular) && (synthetic_col < synthetic_row))
 					)) {
 					square_matrix_is_of_desired_type = false;
 				}
@@ -88,9 +88,9 @@ rts::RTS::sample_metadataless_bitset(void)
 				if (
 					bit &&
 					(
-						((this->square_matrix_type() == RTS::UpperTriangular) && (synthetic_col > synthetic_row)) 
+						((this->square_matrix_type() == RTS::LowerTriangular) && (synthetic_col > synthetic_row)) 
 						||	
-						((this->square_matrix_type() == RTS::LowerTriangular) && (synthetic_col < synthetic_row))
+						((this->square_matrix_type() == RTS::UpperTriangular) && (synthetic_col < synthetic_row))
 					)) {
 					square_matrix_is_of_desired_type = false;
 				}

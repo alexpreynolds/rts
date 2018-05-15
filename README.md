@@ -3,7 +3,11 @@ Random triangular matrix sampler
 
 This program samples an input matrix of binary values, building a square matrix from a random sample of row and column indices. 
 
-The resulting square matrix is tested to determine if it is an upper- or lower-triangular matrix. If it is such a matrix, it is printed to standard output. 
+The resulting square matrix is tested to determine if it is an upper- or lower-triangular matrix. 
+
+A square matrix is called lower-triangular if all the entries above the diagonal are zero, or called upper-triangular if all the entries below the diagonal are zero.
+
+If it an upper- or lower-triangular matrix, it is printed to standard output. 
 
 If the `--preserve-metadata` option is used, the row and column names from the original input matrix are included in the output.
 
@@ -25,7 +29,7 @@ elementF        0       0       0       0       0       0       0       0       
 We can sample this test matrix for any 3x3 upper-triangular matrices we can find within, from a random selection of rows and columns:
 
 ```
-$ make clean && make && make test-upper
+$ make clean && make && make test-lower
 rm -rf *~
 rm -rf rts
 rm -rf rts.o
@@ -34,7 +38,7 @@ clang++ -g -Wall -Wextra -std=c++14 -D__STDC_CONSTANT_MACROS -D__STDINT_MACROS -
 set -e; \
         ROWS=$(wc -l ./test.mtx | awk '{print ($1-1)}'); \
         COLS=$(tail -1 ./test.mtx | awk '{print NF-1}'); \
-        ./rts --rows ${ROWS} --cols ${COLS} --samples 20 --order 3 --rng-seed 123 --upper --preserve-metadata < ./test.mtx
+        ./rts --rows ${ROWS} --cols ${COLS} --samples 20 --order 3 --rng-seed 123 --lower --preserve-metadata < ./test.mtx
         feature03       feature08       feature05
 elementC        1       0       0
 elementE        1       1       0
@@ -57,10 +61,10 @@ elementF        0       0       0
 elementA        1       1       0
 ```
 
-Likewise, we can sample the input matrix for 4x4 lower-triangular matrices:
+Likewise, we can sample the input matrix for 4x4 upper-triangular matrices:
 
 ```
-$ make clean && make && make test-lower
+$ make clean && make && make test-upper
 rm -rf *~
 rm -rf rts
 rm -rf rts.o
@@ -69,7 +73,7 @@ clang++ -g -Wall -Wextra -std=c++14 -D__STDC_CONSTANT_MACROS -D__STDINT_MACROS -
 set -e; \
         ROWS=$(wc -l ./test.mtx | awk '{print ($1-1)}'); \
         COLS=$(tail -1 ./test.mtx | awk '{print NF-1}'); \
-        ./rts --rows ${ROWS} --cols ${COLS} --samples 50 --order 4 --rng-seed 123 --lower --preserve-metadata < ./test.mtx
+        ./rts --rows ${ROWS} --cols ${COLS} --samples 50 --order 4 --rng-seed 123 --upper --preserve-metadata < ./test.mtx
         feature08       feature02       feature09       feature04
 elementF        0       0       0       0
 elementA        0       0       0       1
