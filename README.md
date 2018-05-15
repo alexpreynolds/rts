@@ -22,7 +22,7 @@ elementE        1       0       1       1       0       0       1       1       
 elementF        0       0       0       0       0       0       0       0       0       0       0
 ```
 
-We can sample this test matrix for any 3x3 upper-triangular matrices we can find within in, from a random arrangement of rows and columns:
+We can sample this test matrix for any 3x3 upper-triangular matrices we can find within, from a random selection of rows and columns:
 
 ```
 $ make clean && make && make test-upper
