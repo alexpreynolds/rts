@@ -146,13 +146,9 @@ rts::RTS::read_metadata_matrix_into_bitset(void)
 	int col_idx = 0;
 	int increment = 0;
 	char* name = NULL;
-	char* binary_val = NULL;
 
 	name = (char*) malloc(MAX_NAME_LENGTH + 1);
 	std::memset(name, 0, MAX_NAME_LENGTH + 1);
-
-	binary_val = (char*) malloc(MAX_BINARY_VALUE_LENGTH + 1);
-	std::memset(binary_val, 0, MAX_BINARY_VALUE_LENGTH + 1);
 
 	for (std::string line; std::getline(std::cin, line); ) {
 		char* p = NULL;
@@ -191,12 +187,12 @@ rts::RTS::read_metadata_matrix_into_bitset(void)
 
 		if ((row_idx > 0) && (col_idx > 0)) {
 			// parse 1s and 0s
-			while (col_idx < this->cols()) {
-				std::memcpy(binary_val, lm, 1);
-				bool binary_flag = (std::stoi(binary_val) == 0) ? false : true;
+			while (col_idx <= this->cols()) {
+				bool binary_flag = (*lm == '0') ? false : true;
 				bit_idx = (byte * CHAR_BIT) + bit;
 				this->set_bit(bit_idx, binary_flag);
 				if (this->track_conversion()) {
+					//std::cerr << row_idx << '|' << col_idx << '|' << *lm << '|' << byte << '|' << bit_idx << '|' << this->get_bit(row_idx-1, col_idx-1) << std::endl;
 					if ((bit_idx % this->bits_eighth_perc()) == 0) {
 						std::cerr << "..." << round(100.0*increment/this->real_bits()) << " percent done (" << bit_idx << " bits of " << (this->real_bits() - 1) << ")" << std::endl;
 					}
@@ -207,6 +203,7 @@ rts::RTS::read_metadata_matrix_into_bitset(void)
 					bit = 0;
 					++byte;
 				}
+				lm += 2;
 				++col_idx;
 			}
 			col_idx = 0;
@@ -219,7 +216,6 @@ rts::RTS::read_metadata_matrix_into_bitset(void)
 	}
 
 	free(name);
-	free(binary_val);
 }
 
 void
