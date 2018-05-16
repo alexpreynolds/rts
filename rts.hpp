@@ -9,6 +9,9 @@ extern "C" {
 #define _POSIX_C_SOURCE 200809L
 #endif /* getline() support */
 
+#define MAX_NAME_LENGTH 1024
+#define MAX_BINARY_VALUE_LENGTH 1
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif /* __cplusplus */

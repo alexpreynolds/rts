@@ -45,6 +45,7 @@ rts::RTS::sample_metadata_bitset(void)
 						((this->square_matrix_type() == RTS::UpperTriangular) && (synthetic_col < synthetic_row))
 					)) {
 					square_matrix_is_of_desired_type = false;
+					break;
 				}
 			}
 		}
@@ -137,24 +138,67 @@ rts::RTS::print_metadataless_bitset(void)
 void
 rts::RTS::read_metadata_matrix_into_bitset(void)
 {
-	long idx = 0;
+	long bit_idx = 0;
 	long byte = 0;
 	long bit = 0;
 	std::string token;
 	int row_idx = 0;
 	int col_idx = 0;
 	int increment = 0;
+	char* name = NULL;
+	char* binary_val = NULL;
+
+	name = (char*) malloc(MAX_NAME_LENGTH + 1);
+	std::memset(name, 0, MAX_NAME_LENGTH + 1);
+
+	binary_val = (char*) malloc(MAX_BINARY_VALUE_LENGTH + 1);
+	std::memset(binary_val, 0, MAX_BINARY_VALUE_LENGTH + 1);
+
 	for (std::string line; std::getline(std::cin, line); ) {
-		std::istringstream iss(line);
-		while (std::getline(iss, token, '\t')) {
-			if ((row_idx > 0) && (col_idx > 0)) {
-				bool f = (std::stoi(token) == 0) ? false : true;
-				idx = (byte * CHAR_BIT) + bit;
-				//std::cout << "setting " << token << " to " << f << " at offset " << idx << std::endl;
-				this->set_bit(idx, f);
+		char* p = NULL;
+		char* lm = NULL;
+		const char* lc = line.c_str();
+		lm = const_cast<char*>(lc);
+		
+		if ((row_idx == 0) && (col_idx >= 0)) {
+			// read column name into col_names vector
+			p = std::strchr(lm, '\t');
+			while (p) {
+				std::memcpy(name, lm, p - lm);
+				//std::cerr << "found at: " << p - lm << std::endl;
+				name[p - lm] = '\0';
+				lm = p + 1;
+				//std::cerr << "col: " << name << std::endl;
+				if (col_idx > 0) this->col_names().push_back(name);
+				++col_idx;
+				p = (col_idx == this->cols()) ? std::strchr(lm, '\0') : std::strchr(lm, '\t');
+			}
+			col_idx = 0;
+			++row_idx;
+			continue;
+		}
+
+		if ((row_idx > 0) && (col_idx == 0)) {
+			// read row name into row_names vector
+			p = std::strchr(lm, '\t');
+			std::memcpy(name, lm, p - lm);
+			name[p - lm] = '\0';
+			//std::cerr << "row: " << name << std::endl;
+			this->row_names().push_back(name);
+			++col_idx;
+			lm = p + 1;
+		}
+
+		if ((row_idx > 0) && (col_idx > 0)) {
+			// parse 1s and 0s
+			while (col_idx < this->cols()) {
+				std::memcpy(binary_val, lm, 1);
+				bool binary_flag = (std::stoi(binary_val) == 0) ? false : true;
+				bit_idx = (byte * CHAR_BIT) + bit;
+				this->set_bit(bit_idx, binary_flag);
 				if (this->track_conversion()) {
-					if ((idx % this->bits_eighth_perc()) == 0) {
-						std::cerr << "..." << round(100.0*increment/this->real_bits()) << " percent done (" << idx << " bits of " << (this->real_bits() - 1) << ")" << std::endl;
+					if ((bit_idx % this->bits_eighth_perc()) == 0) {
+						std::cerr << "..." << round(100.0*increment/this->real_bits()) << " percent done (" << bit_idx << " bits of " << (this->real_bits() - 1) << ")" << std::endl;
 					}
 					++increment;
 				}
@@ -163,21 +207,19 @@ rts::RTS::read_metadata_matrix_into_bitset(void)
 					bit = 0;
 					++byte;
 				}
+				++col_idx;
 			}
-			else if ((row_idx > 0) && (col_idx == 0)) {
-				this->row_names().push_back(token);
-			}
-			else if (col_idx > 0) {
-				this->col_names().push_back(token);
-			}
-			++col_idx;
+			col_idx = 0;
+			++row_idx;
+			continue;
 		}
-		col_idx = 0;
-		++row_idx;
 	}
 	if (this->track_conversion()) {
-		std::cerr << "..." << round(100.0*increment/this->real_bits()) << " percent done (" << idx << " bits of " << (this->real_bits() - 1) << ")" << std::endl;
+		std::cerr << "..." << round(100.0*increment/this->real_bits()) << " percent done (" << bit_idx << " bits of " << (this->real_bits() - 1) << ")" << std::endl;
 	}
+
+	free(name);
+	free(binary_val);
 }
 
 void
