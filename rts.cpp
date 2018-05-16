@@ -144,7 +144,7 @@ rts::RTS::read_metadata_matrix_into_bitset(void)
 	std::string token;
 	int row_idx = 0;
 	int col_idx = 0;
-	int increment = 0;
+	long increment = 0;
 	char* name = NULL;
 
 	name = (char*) malloc(MAX_NAME_LENGTH + 1);
@@ -194,7 +194,7 @@ rts::RTS::read_metadata_matrix_into_bitset(void)
 				if (this->track_conversion()) {
 					//std::cerr << row_idx << '|' << col_idx << '|' << *lm << '|' << byte << '|' << bit_idx << '|' << this->get_bit(row_idx-1, col_idx-1) << std::endl;
 					if ((bit_idx % this->bits_eighth_perc()) == 0) {
-						std::cerr << "..." << round(100.0*increment/this->real_bits()) << " percent done (" << bit_idx << " bits of " << (this->real_bits() - 1) << ")" << std::endl;
+						std::cerr << "..." << round(100.0*increment/this->real_bits()) << " percent done (" << bit_idx << " bits of " << (this->real_bits() - 1L) << ")" << std::endl;
 					}
 					++increment;
 				}
@@ -212,7 +212,7 @@ rts::RTS::read_metadata_matrix_into_bitset(void)
 		}
 	}
 	if (this->track_conversion()) {
-		std::cerr << "..." << round(100.0*increment/this->real_bits()) << " percent done (" << bit_idx << " bits of " << (this->real_bits() - 1) << ")" << std::endl;
+		std::cerr << "..." << round(100.0*increment/this->real_bits()) << " percent done (" << bit_idx << " bits of " << (this->real_bits() - 1L) << ")" << std::endl;
 	}
 
 	free(name);
