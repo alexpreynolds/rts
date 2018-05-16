@@ -34,6 +34,7 @@ extern "C" {
 		private:
 			std::vector<unsigned char> _bitset;
 			long _nbytes;
+			long _real_bits;
 			long _max_bits;
 			int _rows;
 			int _cols;
@@ -45,6 +46,8 @@ extern "C" {
 			std::mt19937 _mt19937_uint_gen;
 			std::vector<std::string> _row_names;
 			std::vector<std::string> _col_names;
+			bool _track_conversion;
+			int _bits_eighth_perc;
 
 			inline long
 			_byte_offset_from_rc(const int& r, const int& c)
@@ -91,6 +94,7 @@ extern "C" {
 			std::vector<unsigned char>& bitset() { return _bitset; }
 			long nbytes() const { return _nbytes; }
 			long max_bits() const { return _max_bits; }
+			long real_bits() const { return _real_bits; }
 			int rows() const { return _rows; }
 			void rows(const int& r) { _rows = r; }
 			int cols() const { return _cols; }
@@ -113,6 +117,10 @@ extern "C" {
 			void row_names(const std::vector<std::string>& v) { _row_names = v; }
 			std::vector<std::string>& col_names() { return _col_names; }
 			void col_names(const std::vector<std::string>& v) { _col_names = v; }
+			bool track_conversion() const { return _track_conversion; }
+			void track_conversion(const bool& f) { _track_conversion = f; }
+			int bits_eighth_perc() const { return _bits_eighth_perc; }
+			void bits_eighth_perc(const int& b) { _bits_eighth_perc = b; }
 
 			void initialize_command_line_options(int argc, char** argv);
 			std::string rts_opt_string(void);
@@ -172,6 +180,7 @@ extern "C" {
 					_nbytes = long(ceil((long(_rows) * _cols) / 8.0));
 					//std::cout << _nbytes << std::endl;
 					_bitset.reserve(_nbytes);
+					_real_bits = _rows * _cols;
 					_max_bits = _nbytes << 3;
 					//std::cout << _max_bits << std::endl;
 				}
@@ -239,6 +248,7 @@ extern "C" {
 			rng_seed_specified(false);
 			order(-1);
 			preserve_metadata(false);
+			track_conversion(false);
 		}
 
 		RTS::~RTS() {

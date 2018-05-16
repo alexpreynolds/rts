@@ -137,19 +137,27 @@ rts::RTS::print_metadataless_bitset(void)
 void
 rts::RTS::read_metadata_matrix_into_bitset(void)
 {
+	long idx = 0;
 	long byte = 0;
 	long bit = 0;
 	std::string token;
 	int row_idx = 0;
 	int col_idx = 0;
+	int increment = 0;
 	for (std::string line; std::getline(std::cin, line); ) {
 		std::istringstream iss(line);
 		while (std::getline(iss, token, '\t')) {
 			if ((row_idx > 0) && (col_idx > 0)) {
 				bool f = (std::stoi(token) == 0) ? false : true;
-				long idx = (byte * CHAR_BIT) + bit;
+				idx = (byte * CHAR_BIT) + bit;
 				//std::cout << "setting " << token << " to " << f << " at offset " << idx << std::endl;
 				this->set_bit(idx, f);
+				if (this->track_conversion()) {
+					if ((idx % this->bits_eighth_perc()) == 0) {
+						std::cerr << "..." << round(100.0*increment/this->real_bits()) << " percent done (" << idx << " bits of " << this->real_bits()-1 << ")" << std::endl;
+					}
+					++increment;
+				}
 				++bit;
 				if (bit == CHAR_BIT) {
 					bit = 0;
@@ -166,6 +174,10 @@ rts::RTS::read_metadata_matrix_into_bitset(void)
 		}
 		col_idx = 0;
 		++row_idx;
+	}
+	if (this->track_conversion()) {
+		std::cerr << "..." << round(100.0*increment/this->real_bits()) << " percent done (" << idx << " bits of " << this->real_bits() << ")" << std::endl;
+		++increment;
 	}
 }
 
@@ -194,14 +206,19 @@ rts::RTS::read_metadataless_matrix_into_bitset(void)
 void
 rts::RTS::initialize_bitset(void)
 {
-  this->reserve_bitset(this->rows(), this->cols());
-  this->set_all_bits_to(false);
+	this->reserve_bitset(this->rows(), this->cols());
+	this->set_all_bits_to(false);
+
+	// tracking info
+	if (this->track_conversion()) {
+		this->bits_eighth_perc(this->max_bits() / CHAR_BIT);
+	}
 }
 
 std::string
 rts::RTS::rts_opt_string(void)
 {
-	static std::string _s("r:c:k:s:o:ulphv?");
+	static std::string _s("r:c:k:s:o:ulpthv?");
 	return _s;
 }
 
@@ -216,6 +233,7 @@ rts::RTS::rts_long_options(void)
 	static struct option _u = { "upper",                      no_argument,         NULL,    'u' };
 	static struct option _l = { "lower",                      no_argument,         NULL,    'l' };
 	static struct option _p = { "preserve-metadata",          no_argument,         NULL,    'p' };
+	static struct option _t = { "track-conversion",           no_argument,         NULL,    't' };
 	static struct option _h = { "help",                       no_argument,         NULL,    'h' };
 	static struct option _v = { "version",                    no_argument,         NULL,    'v' };
 	static struct option _0 = { NULL,                         no_argument,         NULL,     0  };
@@ -228,6 +246,7 @@ rts::RTS::rts_long_options(void)
 	_opts.push_back(_u);
 	_opts.push_back(_l);
 	_opts.push_back(_p);
+	_opts.push_back(_t);
 	_opts.push_back(_h);
 	_opts.push_back(_v);
 	_opts.push_back(_0);
@@ -286,6 +305,9 @@ rts::RTS::initialize_command_line_options(int argc, char** argv)
 			break;
 		case 'p':
 			this->preserve_metadata(true);
+			break;
+		case 't':
+			this->track_conversion(true);
 			break;
 		case 'h':
 			this->print_usage(stdout);
