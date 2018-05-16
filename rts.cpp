@@ -154,7 +154,7 @@ rts::RTS::read_metadata_matrix_into_bitset(void)
 				this->set_bit(idx, f);
 				if (this->track_conversion()) {
 					if ((idx % this->bits_eighth_perc()) == 0) {
-						std::cerr << "..." << round(100.0*increment/this->real_bits()) << " percent done (" << idx << " bits of " << this->real_bits()-1 << ")" << std::endl;
+						std::cerr << "..." << round(100.0*increment/this->real_bits()) << " percent done (" << idx << " bits of " << (this->real_bits() - 1) << ")" << std::endl;
 					}
 					++increment;
 				}
@@ -176,8 +176,7 @@ rts::RTS::read_metadata_matrix_into_bitset(void)
 		++row_idx;
 	}
 	if (this->track_conversion()) {
-		std::cerr << "..." << round(100.0*increment/this->real_bits()) << " percent done (" << idx << " bits of " << this->real_bits() << ")" << std::endl;
-		++increment;
+		std::cerr << "..." << round(100.0*increment/this->real_bits()) << " percent done (" << idx << " bits of " << (this->real_bits() - 1) << ")" << std::endl;
 	}
 }
 
@@ -426,6 +425,7 @@ rts::RTS::rts_io_options(void)
 						  "  --order=n                      Order of triangular matrix (integer, required)\n" \
 						  "  --upper | --lower              Type of triangular matrix (required)\n" \
 						  "  --preserve-metadata            Parse and print row and column names with samples (optional)\n" \
+						  "  --track-conversion             Track progress of conversion to bits (optional)\n" \
 						  "  --rng-seed=n                   RNG seed (integer, optional)\n" );
 	return _s;
 }
