@@ -28,7 +28,7 @@ main(int argc, char** argv)
 void
 rts::RTS::sample_metadata_bitset(void)
 {
-	for (int sample = 0; sample < this->samples(); ++sample) {
+	for (long sample = 0; sample < this->samples(); ++sample) {
 		bool square_matrix_is_of_desired_type = true;
 		auto rows_sample = this->sample_order_indices_without_replacement(this->order(), this->rows());
 		auto cols_sample = this->sample_order_indices_without_replacement(this->order(), this->cols());
@@ -74,7 +74,7 @@ rts::RTS::sample_metadata_bitset(void)
 void
 rts::RTS::sample_metadataless_bitset(void)
 {
-	for (int sample = 0; sample < this->samples(); ++sample) {
+	for (long sample = 0; sample < this->samples(); ++sample) {
 		bool square_matrix_is_of_desired_type = true;
 		auto rows_sample = this->sample_order_indices_without_replacement(this->order(), this->rows());
 		auto cols_sample = this->sample_order_indices_without_replacement(this->order(), this->cols());
@@ -302,7 +302,7 @@ rts::RTS::initialize_command_line_options(int argc, char** argv)
 								 &client_long_index);
 	long _r = -1;
 	long _c = -1;
-	int _k = -1;
+	long _k = -1;
 	int _s = -1;
 	int _o = -1;
 	bool is_upper_set = false;
@@ -321,7 +321,7 @@ rts::RTS::initialize_command_line_options(int argc, char** argv)
 			this->cols(_c);
 			break;
 		case 'k':
-			std::sscanf(optarg, "%d", &_k);
+			std::sscanf(optarg, "%ld", &_k);
 			this->samples(_k);
 			break;
 		case 's':

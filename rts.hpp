@@ -43,7 +43,7 @@ extern "C" {
 			long _max_bits;
 			long _rows;
 			long _cols;
-			int _samples;
+			long _samples;
 			int _rng_seed;
 			bool _rng_seed_specified;
 			bool _preserve_metadata;
@@ -104,8 +104,8 @@ extern "C" {
 			void rows(const long& r) { _rows = r; }
 			long cols() const { return _cols; }
 			void cols(const long& c) { _cols = c; }
-			int samples() const { return _samples; }
-			void samples(const int& k) { _samples = k; }
+			long samples() const { return _samples; }
+			void samples(const long& k) { _samples = k; }
 			int rng_seed() const { return _rng_seed; }
 			void rng_seed(const int& s) { _rng_seed = s; }
 			bool rng_seed_specified() const { return _rng_seed_specified; }
