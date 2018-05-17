@@ -41,8 +41,8 @@ extern "C" {
 			long _nbytes;
 			long _real_bits;
 			long _max_bits;
-			int _rows;
-			int _cols;
+			long _rows;
+			long _cols;
 			int _samples;
 			int _rng_seed;
 			bool _rng_seed_specified;
@@ -100,10 +100,10 @@ extern "C" {
 			long nbytes() const { return _nbytes; }
 			long max_bits() const { return _max_bits; }
 			long real_bits() const { return _real_bits; }
-			int rows() const { return _rows; }
-			void rows(const int& r) { _rows = r; }
-			int cols() const { return _cols; }
-			void cols(const int& c) { _cols = c; }
+			long rows() const { return _rows; }
+			void rows(const long& r) { _rows = r; }
+			long cols() const { return _cols; }
+			void cols(const long& c) { _cols = c; }
 			int samples() const { return _samples; }
 			void samples(const int& k) { _samples = k; }
 			int rng_seed() const { return _rng_seed; }

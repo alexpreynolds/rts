@@ -300,8 +300,8 @@ rts::RTS::initialize_command_line_options(int argc, char** argv)
 								 this->rts_opt_string().c_str(),
 								 this->rts_long_options(),
 								 &client_long_index);
-	int _r = -1;
-	int _c = -1;
+	long _r = -1;
+	long _c = -1;
 	int _k = -1;
 	int _s = -1;
 	int _o = -1;
@@ -313,11 +313,11 @@ rts::RTS::initialize_command_line_options(int argc, char** argv)
 	while (client_opt != -1) {
 		switch (client_opt) {
 		case 'r':
-			std::sscanf(optarg, "%d", &_r);
+			std::sscanf(optarg, "%ld", &_r);
 			this->rows(_r);
 			break;
 		case 'c':
-			std::sscanf(optarg, "%d", &_c);
+			std::sscanf(optarg, "%ld", &_c);
 			this->cols(_c);
 			break;
 		case 'k':
@@ -407,7 +407,7 @@ rts::RTS::initialize_command_line_options(int argc, char** argv)
 	std::mt19937 gen(this->rng_seed_specified() ? this->rng_seed() : time(NULL));
  	this->mt19937_uint_gen(gen);
 
- 	// initialize metadata
+ 	// reserve space for row and column names
  	if (this->preserve_metadata()) {
  		this->row_names().reserve(this->rows());
  		this->col_names().reserve(this->cols());
