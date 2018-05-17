@@ -30,39 +30,43 @@ rts::RTS::sample_metadata_bitset(void)
 {
 	for (long sample = 0; sample < this->samples(); ++sample) {
 		bool square_matrix_is_of_desired_type = true;
-		auto rows_sample = this->sample_order_indices_without_replacement(this->order(), this->rows());
-		auto cols_sample = this->sample_order_indices_without_replacement(this->order(), this->cols());
-		int synthetic_row = 0;
-		for (auto row_iterator = rows_sample.begin(); row_iterator != rows_sample.end(); ++row_iterator, ++synthetic_row) {
-			int synthetic_col = 0;
-			for (auto col_iterator = cols_sample.begin(); col_iterator != cols_sample.end(); ++col_iterator, ++synthetic_col) {
-				bool bit = get_bit(*row_iterator, *col_iterator);
-				if (
-					bit &&
-					(
-						((this->square_matrix_type() == RTS::LowerTriangular) && (synthetic_col > synthetic_row)) 
-						||	
-						((this->square_matrix_type() == RTS::UpperTriangular) && (synthetic_col < synthetic_row))
-					)) {
+		std::unordered_set<int> rows_sample = this->sample_order_indices_without_replacement(this->order(), this->rows());
+		std::unordered_set<int> cols_sample = this->sample_order_indices_without_replacement(this->order(), this->cols());
+		// we really only want to search either the upper or lower triangle for a disqualifying bit
+		int synthetic_row = (this->square_matrix_type() == RTS::UpperTriangular) ? 1 : 0;
+		std::unordered_set<int>::iterator row_it = std::next(rows_sample.begin(), synthetic_row);
+		int row_limit = this->order();
+		for (; synthetic_row < row_limit; ++row_it, ++synthetic_row) {
+			int synthetic_col = (this->square_matrix_type() == RTS::UpperTriangular) ? 0 : synthetic_row + 1;
+			std::unordered_set<int>::iterator col_it = std::next(cols_sample.begin(), synthetic_col);
+			int col_limit = (this->square_matrix_type() == RTS::UpperTriangular) ? synthetic_row : this->order();
+			for (; synthetic_col < col_limit; ++col_it, ++synthetic_col) {
+				bool bit = get_bit(*row_it, *col_it);
+				//std::cerr << '|' << synthetic_row << '|' << synthetic_col << '(' << col_limit << ')' << '|' << *row_it << '|' << *col_it << '|' << bit << std::endl;
+				if (bit) {
 					square_matrix_is_of_desired_type = false;
 					break;
 				}
 			}
+			// break out if we need to
+			if (!square_matrix_is_of_desired_type) { 
+				break; 
+			}
 		}
-		// if matrix is upper or lower triangular, print it
+		// if matrix qualifies, print it
 		if (square_matrix_is_of_desired_type) {
 			int synthetic_row = 0;
-			for (auto row_iterator = rows_sample.begin(); row_iterator != rows_sample.end(); ++row_iterator, ++synthetic_row) {
+			for (std::unordered_set<int>::iterator row_it = rows_sample.begin(); row_it != rows_sample.end(); ++row_it, ++synthetic_row) {
 				int synthetic_col = 0;
 				if (synthetic_row == 0) {
-					for (auto col_iterator = cols_sample.begin(); col_iterator != cols_sample.end(); ++col_iterator, ++synthetic_col) {
-						std::cout << '\t' << this->col_names()[*col_iterator];
+					for (std::unordered_set<int>::iterator col_it = cols_sample.begin(); col_it != cols_sample.end(); ++col_it, ++synthetic_col) {
+						std::cout << '\t' << this->col_names()[*col_it];
 					}
 					std::cout << std::endl;
 				}
-				std::cout << this->row_names()[*row_iterator];
-				for (auto col_iterator = cols_sample.begin(); col_iterator != cols_sample.end(); ++col_iterator, ++synthetic_col) {
-					bool bit = get_bit(*row_iterator, *col_iterator);
+				std::cout << this->row_names()[*row_it];
+				for (std::unordered_set<int>::iterator col_it = cols_sample.begin(); col_it != cols_sample.end(); ++col_it, ++synthetic_col) {
+					bool bit = get_bit(*row_it, *col_it);
 					std::cout << '\t' << bit;
 				}
 				std::cout << std::endl;
