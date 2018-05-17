@@ -86,6 +86,12 @@ elementF        0       0       0       0
 elementA        0       0       0       1
 ```
 
+### Performance characteristics
+
 ## Memory usage
 
-The input matrix is read into a bit array to reduce storage overhead and speed sampling. The memory usage is `ceil((rows * cols)/8)` bytes.
+The input matrix of binary values is read into a bit array in single-byte increments. Using a bit array reduces storage overhead considerably, which is an issue for very large input matrices. The memory usage of the bit array is `ceil((rows * cols)/8)` bytes.
+
+## Sampling
+
+Depending on the specified type of matrix we are interested in, we only search the upper or lower triangle for disqualifying bits. If one is found, we immediately drop the sample and try the next, instead of searching through the rest of the matrix. This reduces overall lookup time.
