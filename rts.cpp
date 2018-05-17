@@ -146,6 +146,7 @@ rts::RTS::read_metadata_matrix_into_bitset(void)
 	int col_idx = 0;
 	long increment = 0;
 	char* name = NULL;
+	int accumulator = 0;
 
 	name = (char*) malloc(MAX_NAME_LENGTH + 1);
 	std::memset(name, 0, MAX_NAME_LENGTH + 1);
@@ -188,19 +189,20 @@ rts::RTS::read_metadata_matrix_into_bitset(void)
 		if ((row_idx > 0) && (col_idx > 0)) {
 			// parse 1s and 0s
 			while (col_idx <= this->cols()) {
-				bool binary_flag = (*lm == '0') ? false : true;
-				bit_idx = (byte * CHAR_BIT) + bit;
-				this->set_bit(bit_idx, binary_flag);
+				accumulator += (*lm == '0') ? 0 : 1 << bit;
+				//std::cerr << bit << '|' << *lm << '|' << accumulator << std::endl;
 				if (this->track_conversion()) {
+					bit_idx = (byte * CHAR_BIT) + bit;
 					//std::cerr << row_idx << '|' << col_idx << '|' << *lm << '|' << byte << '|' << bit_idx << '|' << this->get_bit(row_idx-1, col_idx-1) << std::endl;
-					if ((bit_idx % this->bits_eighth_perc()) == 0) {
-						std::cerr << "..." << round(100.0*increment/this->real_bits()) << " percent done (" << bit_idx << " bits of " << (this->real_bits() - 1L) << ")" << std::endl;
+					if ((bit_idx % this->bits_perc()) == 0) {
+						std::cerr << "progress: " << "..." << std::setfill('.') << std::setw(MAX_PERCENTAGE_WIDTH) << round(100.0*increment/this->real_bits()) << " percent done (" << std::setfill('.') << std::setw(MAX_BIT_WIDTH) << bit_idx << " bits of " << std::setfill('.') << std::setw(MAX_BIT_WIDTH) << (this->real_bits() - 1L) << ")" << std::endl;
 					}
 					++increment;
 				}
-				++bit;
-				if (bit == CHAR_BIT) {
+				if (++bit == CHAR_BIT) {
+					this->set_byte(byte, (unsigned char)accumulator);
 					bit = 0;
+					accumulator = 0;
 					++byte;
 				}
 				lm += 2;
@@ -211,8 +213,9 @@ rts::RTS::read_metadata_matrix_into_bitset(void)
 			continue;
 		}
 	}
+	this->set_byte(byte, (unsigned char)accumulator);
 	if (this->track_conversion()) {
-		std::cerr << "..." << round(100.0*increment/this->real_bits()) << " percent done (" << bit_idx << " bits of " << (this->real_bits() - 1L) << ")" << std::endl;
+		std::cerr << "progress: " << "..." << std::setfill('.') << std::setw(MAX_PERCENTAGE_WIDTH) << round(100.0*increment/this->real_bits()) << " percent done (" << std::setfill('.') << std::setw(MAX_BIT_WIDTH) << bit_idx << " bits of " << std::setfill('.') << std::setw(MAX_BIT_WIDTH) << (this->real_bits() - 1L) << ")" << std::endl;
 	}
 
 	free(name);
@@ -247,9 +250,7 @@ rts::RTS::initialize_bitset(void)
 	this->set_all_bits_to(false);
 
 	// tracking info
-	if (this->track_conversion()) {
-		this->bits_eighth_perc(this->max_bits() / CHAR_BIT);
-	}
+	if (this->track_conversion()) { this->bits_perc(this->max_bits() / CHAR_BIT); }
 }
 
 std::string

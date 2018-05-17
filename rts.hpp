@@ -10,6 +10,8 @@ extern "C" {
 #endif /* getline() support */
 
 #define MAX_NAME_LENGTH 4096
+#define MAX_BIT_WIDTH 16
+#define MAX_PERCENTAGE_WIDTH 3
 
 #ifdef __cplusplus
 } /* extern "C" */
@@ -28,6 +30,7 @@ extern "C" {
 	#include <time.h>
 	#include <random>
 	#include <unordered_set>
+	#include <iomanip>
 
 	namespace rts
 	{
@@ -49,7 +52,7 @@ extern "C" {
 			std::vector<std::string> _row_names;
 			std::vector<std::string> _col_names;
 			bool _track_conversion;
-			int _bits_eighth_perc;
+			int _bits_perc;
 
 			inline long
 			_byte_offset_from_rc(const int& r, const int& c)
@@ -121,8 +124,8 @@ extern "C" {
 			void col_names(const std::vector<std::string>& v) { _col_names = v; }
 			bool track_conversion() const { return _track_conversion; }
 			void track_conversion(const bool& f) { _track_conversion = f; }
-			int bits_eighth_perc() const { return _bits_eighth_perc; }
-			void bits_eighth_perc(const int& b) { _bits_eighth_perc = b; }
+			int bits_perc() const { return _bits_perc; }
+			void bits_perc(const int& b) { _bits_perc = b; }
 
 			void initialize_command_line_options(int argc, char** argv);
 			std::string rts_opt_string(void);
@@ -207,6 +210,12 @@ extern "C" {
 				long o = _byte_offset_from_rc(r, c);
 				int s = o % CHAR_BIT;
 				_bitset[o] ^= (-x ^ _bitset[o]) & (1UL << s);
+			}
+
+			void
+			set_byte(const long& o, const unsigned char& c)
+			{
+				_bitset[o] = c;
 			}
 
 			void
